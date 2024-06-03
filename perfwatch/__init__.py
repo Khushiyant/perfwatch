@@ -1,4 +1,4 @@
-from .src import PerformanceProfiler  # noqa
+from .src import profile_decorator  # noqa
 from .utils import logger  # noqa
 
-__all__ = ["PerformanceProfiler", "logger"]
+__all__ = ["profile_decorator", "logger"]

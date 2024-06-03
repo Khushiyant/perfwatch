@@ -1,1 +1,1 @@
-from .watcher import PerformanceProfiler  # noqa
+from .watcher import profile_decorator  # noqa
