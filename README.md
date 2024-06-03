@@ -16,6 +16,26 @@ To install perfwatch, run the following command:
 pip install perfwatch
 ```
 
+## Development
+
+To install perfwatch for development, clone the repository and run the following command:
+
+```bash
+poetry install
+```
+To setup pre-commit hooks, run the following command:
+
+```bash
+poetry run pre-commit install
+pre-commit run --all-files
+```
+
+To run the tests, run the following command:
+
+```bash
+poetry run pytest
+```
+
 ## Usage
 
 ```python
