@@ -27,7 +27,6 @@ To setup pre-commit hooks, run the following command:
 
 ```bash
 poetry run pre-commit install
-pre-commit run --all-files
 ```
 
 To run the tests, run the following command:

@@ -382,6 +382,21 @@ files = [
 ]
 
 [[package]]
+name = "scapy"
+version = "2.5.0"
+description = "Scapy: interactive packet manipulation tool"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, <4"
+files = [
+    {file = "scapy-2.5.0.tar.gz", hash = "sha256:5b260c2b754fd8d409ba83ee7aee294ecdbb2c235f9f78fe90bc11cb6e5debc2"},
+]
+
+[package.extras]
+basic = ["ipython"]
+complete = ["cryptography (>=2.0)", "ipython", "matplotlib", "pyx"]
+docs = ["sphinx (>=3.0.0)", "sphinx_rtd_theme (>=0.4.3)", "tox (>=3.0.0)"]
+
+[[package]]
 name = "tomli"
 version = "2.0.1"
 description = "A lil' TOML parser"
@@ -415,4 +430,4 @@ test = ["covdefaults (>=2.3)", "coverage (>=7.2.7)", "coverage-enable-subprocess
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "8c47bd9ea942085a79357b0563469ccfe6f596c444a2fc09be06df9ca67ed86a"
+content-hash = "85f75ba75559983d3dc9d2a8693a0b278d764527c755bc2a5c9ee795ea26ba27"

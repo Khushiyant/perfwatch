@@ -5,10 +5,9 @@ import line_profiler
 import cProfile
 import pstats
 import io
-import logging
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+import sys
+from .network import NetworkProfiler
+from ..utils import logger
 
 
 class ProfilerService:
@@ -38,7 +37,17 @@ class ProfilerService:
         results = []
         for profiler_type in profiler_types:
             try:
-                result = self.profiler_types[profiler_type](func, *args, **kwargs)
+                if profiler_type == "network":
+                    packet_src = kwargs.pop("packet_src", None)
+                    if packet_src is None:
+                        raise ValueError(
+                            "Packet source must be specified for network profiling"
+                        )
+                    result = self.profiler_types[profiler_type](
+                        func, packet_src, *args, **kwargs
+                    )
+                else:
+                    result = self.profiler_types[profiler_type](func, *args, **kwargs)
                 results.append((profiler_type, result))
             except Exception as e:
                 logger.error(f"Error profiling {profiler_type}: {e}")
@@ -95,16 +104,35 @@ class ProfilerService:
         return result
 
     def io_profile(self, func, *args, **kwargs):
-        # Will have to implment profile using ioprofiler or pyinstrument to profile IO
-        raise NotImplementedError
+        output = io.StringIO()
+        original_stdout = sys.stdout
+        sys.stdout = output
+
+        input_bytes = 0
+        original_stdin = sys.stdin
+        input_buffer = io.StringIO()
+        sys.stdin = input_buffer
+
+        func(*args, **kwargs)
+
+        sys.stdout = original_stdout
+        captured_output = output.getvalue()
+        write_bytes = len(captured_output.encode("utf-8"))
+
+        sys.stdin = original_stdin
+        input_bytes = len(input_buffer.getvalue().encode("utf-8"))
+
+        logger.info(f"IO Write Bytes: {write_bytes} bytes")
+        logger.info(f"IO Read Bytes: {input_bytes} bytes")
 
     def database_profile(self, func, *args, **kwargs):
         # Will have to implment profile using django-debug-toolbar or pg_stat_statements to profile database
         raise NotImplementedError
 
-    def network_profile(self, func, *args, **kwargs):
-        # Will have to implment profile using tcpdump or Wireshark to profile network
-        raise NotImplementedError
+    def network_profile(self, func, packet_src, *args, **kwargs):
+        network_profiler = NetworkProfiler(packet_src=packet_src)
+        network_profiler.network_profile(func, *args, **kwargs)
+        return network_profiler.get_network_profile()
 
     def gpu_profile(self, func, *args, **kwargs):
         # Will have to implment profile using nvidia-smi or GPU-Z to profile GPU
@@ -130,10 +158,11 @@ class ProfilerService:
 profiler_service = ProfilerService()
 
 
-def profile_decorator(profiler_type):
+def profile_decorator(profiler_type, **kwargs):
     def decorator(func):
-        def wrapper(*args, **kwargs):
-            return profiler_service.profile(func, profiler_type, *args, **kwargs)
+        def wrapper(*args, **wrapper_kwargs):
+            merged_kwargs = {**kwargs, **wrapper_kwargs}
+            return profiler_service.profile(func, profiler_type, *args, **merged_kwargs)
 
         return wrapper
 
