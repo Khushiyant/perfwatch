@@ -1,1 +1,1 @@
-from .watcher import profile_decorator  # noqa
+from .watcher import watch  # noqa

@@ -158,7 +158,7 @@ class ProfilerService:
 profiler_service = ProfilerService()
 
 
-def profile_decorator(profiler_type, **kwargs):
+def watch(profiler_type, **kwargs):
     def decorator(func):
         def wrapper(*args, **wrapper_kwargs):
             merged_kwargs = {**kwargs, **wrapper_kwargs}

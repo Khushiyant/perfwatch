@@ -1,4 +1,4 @@
-from .src import profile_decorator  # noqa
+from .src import watch  # noqa
 from .utils import logger  # noqa
 
-__all__ = ["profile_decorator", "logger"]
+__all__ = ["watch", "logger"]
