@@ -65,16 +65,13 @@ class ProfilerService:
         logger.info(s.getvalue())
         return result
 
-    def time_profile(self, func):
-        def wrapper(*args, **kwargs):
-            start_time = time.time()
-            result = func(*args, **kwargs)
-            end_time = time.time()
-            execution_time = end_time - start_time
-            logger.info(f"Time execution: {execution_time:.6f} seconds")
-            return result
-
-        return wrapper
+    def time_profile(self, func, *args, **kwargs):
+        start_time = time.time()
+        result = func(*args, **kwargs)
+        end_time = time.time()
+        execution_time = end_time - start_time
+        logger.info(f"Time execution: {execution_time:.6f} seconds")
+        return result
 
     def memory_profile(self, func, *args, **kwargs):
         profiler = memory_profiler.profile
