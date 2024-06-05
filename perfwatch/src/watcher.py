@@ -7,6 +7,7 @@ import pstats
 import io
 import sys
 from .network import NetworkProfiler
+from .gpu import GPUProfiler
 from ..utils import logger
 
 
@@ -79,17 +80,12 @@ class ProfilerService:
         return result
 
     def thread_profile(self, func, *args, **kwargs):
-        threads = []
-
-        def wrapper(*args, **kwargs):
-            t = threading.Thread(target=func, args=args, kwargs=kwargs)
-            threads.append(t)
-            t.start()
-
-        wrapper(*args, **kwargs)
-        for t in threads:
-            t.join()
-        return threads
+        threads_before = threading.enumerate()
+        result = func(*args, **kwargs)
+        threads_after = threading.enumerate()
+        new_threads = [t for t in threads_after if t not in threads_before]
+        logger.info(f"New threads created: {new_threads}")
+        return result
 
     def line_profile(self, func, *args, **kwargs):
         profiler = line_profiler.LineProfiler()
@@ -128,12 +124,11 @@ class ProfilerService:
 
     def network_profile(self, func, packet_src, *args, **kwargs):
         network_profiler = NetworkProfiler(packet_src=packet_src)
-        network_profiler.network_profile(func, *args, **kwargs)
-        return network_profiler.get_network_profile()
+        return network_profiler.network_profile(func, *args, **kwargs)
 
     def gpu_profile(self, func, *args, **kwargs):
-        # Will have to implment profile using nvidia-smi or GPU-Z to profile GPU
-        raise NotImplementedError
+        gpu_profiler = GPUProfiler()
+        return gpu_profiler.gpu_profile(func, *args, **kwargs)
 
     def cache_profile(self, func, *args, **kwargs):
         # Will have to implment profile using cachegrind or valgrind to profile cache

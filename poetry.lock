@@ -186,6 +186,16 @@ files = [
 ]
 
 [[package]]
+name = "nvidia-ml-py3"
+version = "7.352.0"
+description = "Python Bindings for the NVIDIA Management Library"
+optional = false
+python-versions = "*"
+files = [
+    {file = "nvidia-ml-py3-7.352.0.tar.gz", hash = "sha256:390f02919ee9d73fe63a98c73101061a6b37fa694a793abf56673320f1f51277"},
+]
+
+[[package]]
 name = "packaging"
 version = "24.0"
 description = "Core utilities for Python packages"
@@ -430,4 +440,4 @@ test = ["covdefaults (>=2.3)", "coverage (>=7.2.7)", "coverage-enable-subprocess
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "85f75ba75559983d3dc9d2a8693a0b278d764527c755bc2a5c9ee795ea26ba27"
+content-hash = "3eada3a2bc8f6986b8e4aad87cfe15fc83e25652ce3311b4d818b73c93571bc1"
