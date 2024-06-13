@@ -38,9 +38,9 @@ poetry run pytest
 ## Usage
 
 ```python
-from perfwatch import profile_decorator
+from perfwatch import watch
 
-@profile_decorator(["line", "cpu", "time"])
+@watch(["line", "cpu", "time"])
 def test():
     for _ in range(1000000):
         pass
