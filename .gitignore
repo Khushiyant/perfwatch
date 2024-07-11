@@ -35,3 +35,6 @@ Thumbs.db
 
 # local test file
 test.py
+
+# .env file
+.env

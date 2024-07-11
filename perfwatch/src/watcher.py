@@ -1,14 +1,17 @@
-import time
-import threading
-import memory_profiler
-import line_profiler
 import cProfile
-import pstats
 import io
+import pstats
 import sys
-from .network import NetworkProfiler
-from .gpu import GPUProfiler
+import threading
+import time
+from contextlib import redirect_stdout
+
+import line_profiler
+import memory_profiler
+
 from ..utils import logger
+from .gpu import GPUProfiler
+from .network import NetworkProfiler
 
 
 class ProfilerService:
@@ -36,6 +39,9 @@ class ProfilerService:
             if profiler_type not in self.profiler_types:
                 raise ValueError(f"Invalid profiler type: {profiler_type}")
         results = []
+
+        self.logger = logger
+
         for profiler_type in profiler_types:
             try:
                 if profiler_type == "network":
@@ -51,7 +57,7 @@ class ProfilerService:
                     result = self.profiler_types[profiler_type](func, *args, **kwargs)
                 results.append((profiler_type, result))
             except Exception as e:
-                logger.error(f"Error profiling {profiler_type}: {e}")
+                self.logger.error(f"Error profiling {profiler_type}: {e}")
                 results.append((profiler_type, None))
         return results
 
@@ -60,10 +66,10 @@ class ProfilerService:
         profiler.enable()
         result = func(*args, **kwargs)
         profiler.disable()
-        s = io.StringIO()
-        ps = pstats.Stats(profiler, stream=s).sort_stats("cumulative")
+        f = io.StringIO()
+        ps = pstats.Stats(profiler, stream=f).sort_stats("cumulative")
         ps.print_stats()
-        logger.info(s.getvalue())
+        self.logger.info(f.getvalue())
         return result
 
     def time_profile(self, func, *args, **kwargs):
@@ -71,7 +77,7 @@ class ProfilerService:
         result = func(*args, **kwargs)
         end_time = time.time()
         execution_time = end_time - start_time
-        logger.info(f"Time execution: {execution_time:.6f} seconds")
+        self.logger.info(f"Time execution: {execution_time:.6f} seconds")
         return result
 
     def memory_profile(self, func, *args, **kwargs):
@@ -84,7 +90,7 @@ class ProfilerService:
         result = func(*args, **kwargs)
         threads_after = threading.enumerate()
         new_threads = [t for t in threads_after if t not in threads_before]
-        logger.info(f"New threads created: {new_threads}")
+        self.logger.info(f"New threads created: {new_threads}")
         return result
 
     def line_profile(self, func, *args, **kwargs):
@@ -93,13 +99,16 @@ class ProfilerService:
         profiler.enable()
         result = func(*args, **kwargs)
         profiler.disable()
-        profiler.print_stats()
+        f = io.StringIO()
+        with redirect_stdout(f):
+            profiler.print_stats(stream=None)
+        self.logger.info(f.getvalue())
         return result
 
     def io_profile(self, func, *args, **kwargs):
-        output = io.StringIO()
+        f = io.StringIO()
         original_stdout = sys.stdout
-        sys.stdout = output
+        sys.stdout = f
 
         input_bytes = 0
         original_stdin = sys.stdin
@@ -109,14 +118,14 @@ class ProfilerService:
         func(*args, **kwargs)
 
         sys.stdout = original_stdout
-        captured_output = output.getvalue()
+        captured_output = f.getvalue()
         write_bytes = len(captured_output.encode("utf-8"))
 
         sys.stdin = original_stdin
         input_bytes = len(input_buffer.getvalue().encode("utf-8"))
 
-        logger.info(f"IO Write Bytes: {write_bytes} bytes")
-        logger.info(f"IO Read Bytes: {input_bytes} bytes")
+        self.logger.info(f"IO Write Bytes: {write_bytes} bytes")
+        self.logger.info(f"IO Read Bytes: {input_bytes} bytes")
 
     def database_profile(self, func, *args, **kwargs):
         # Will have to implment profile using django-debug-toolbar or pg_stat_statements to profile database
