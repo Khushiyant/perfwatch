@@ -162,7 +162,15 @@ profiler_service = ProfilerService()
 def watch(profiler_type, **kwargs):
     def decorator(func):
         def wrapper(*args, **wrapper_kwargs):
-            merged_kwargs = {**kwargs, **wrapper_kwargs}
+            merged_kwargs: dict = {**kwargs, **wrapper_kwargs}
+            try:
+                return_context = merged_kwargs.pop("return_context")
+            except KeyError:
+                return_context = False
+            if return_context:
+                return profiler_service.profile(
+                    func, profiler_type, *args, **merged_kwargs
+                )
             return profiler_service.profile(func, profiler_type, *args, **merged_kwargs)
 
         return wrapper
