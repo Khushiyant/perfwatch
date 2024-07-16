@@ -1,6 +1,6 @@
 # Perfwatch
 
-Perfwatch is a python package that allows you to monitor the performance of your code. It is designed to be used in a Jupyter notebook, but can also be used in a Python script.
+Perfwatch is a python package that allows you to monitor the performance of your code. It can be used in any python enabled environment with ease of using it as decorator with rotating logging support
 
 ## Table of Contents
 
