@@ -79,7 +79,7 @@ if __name__ == "__main__":
 You can customize the profiling behavior by passing additional keyword arguments to the `watch` decorator. For example:
 
 ```python
-@watch("network", packet_src="localhost")
+@watch(["network"], packet_src="localhost")
 def my_function(x, y):
     # function implementation
     pass
@@ -87,14 +87,7 @@ def my_function(x, y):
 
 #### Logging
 
-The Profiler Service uses a logger to output profiling results. You can specify a log file path using the log_file_path keyword argument:
-
-```python
-@watch("cpu", log_file_path="profiling.log")
-def my_function(x, y):
-    # function implementation
-    pass
-```
+You can log the profiling results to a file by assigning `LOG_FILE_PATH` envar to desired file location
 
 ## License
 
