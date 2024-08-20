@@ -1,6 +1,4 @@
-import cProfile
 import io
-import pstats
 import sys
 import threading
 import time
@@ -10,9 +8,11 @@ import line_profiler
 import memory_profiler
 
 from ..utils import logger
+
 from .gpu import GPUProfiler
 from .network import NetworkProfiler
 from .cache import CacheProfiler
+from .cpu import CPUProfiler
 
 
 class ProfilerService:
@@ -63,14 +63,8 @@ class ProfilerService:
         return results
 
     def cpu_profile(self, func, *args, **kwargs):
-        profiler = cProfile.Profile()
-        profiler.enable()
-        result = func(*args, **kwargs)
-        profiler.disable()
-        f = io.StringIO()
-        ps = pstats.Stats(profiler, stream=f).sort_stats("cumulative")
-        ps.print_stats()
-        self.logger.info(f.getvalue())
+        profiler = CPUProfiler()
+        result = profiler.profile(func, *args, **kwargs)
         return result
 
     def time_profile(self, func, *args, **kwargs):
