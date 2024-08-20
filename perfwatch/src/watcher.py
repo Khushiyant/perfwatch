@@ -12,6 +12,7 @@ import memory_profiler
 from ..utils import logger
 from .gpu import GPUProfiler
 from .network import NetworkProfiler
+from .cache import CacheProfiler
 
 
 class ProfilerService:
@@ -140,8 +141,8 @@ class ProfilerService:
         return gpu_profiler.gpu_profile(func, *args, **kwargs)
 
     def cache_profile(self, func, *args, **kwargs):
-        # Will have to implment profile using cachegrind or valgrind to profile cache
-        raise NotImplementedError
+        cache_profiler = CacheProfiler()
+        return cache_profiler.run_valgrind(func, *args, **kwargs)
 
     def exception_profile(self, func, *args, **kwargs):
         # Will have to implment profile using sentry or rollbar to profile exceptions
