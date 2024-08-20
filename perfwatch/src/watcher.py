@@ -1,6 +1,5 @@
 import io
 import sys
-import threading
 import time
 from contextlib import redirect_stdout
 
@@ -13,6 +12,7 @@ from .gpu import GPUProfiler
 from .network import NetworkProfiler
 from .cache import CacheProfiler
 from .cpu import CPUProfiler
+from .thread import ThreadProfiler
 
 
 class ProfilerService:
@@ -81,11 +81,8 @@ class ProfilerService:
         return result
 
     def thread_profile(self, func, *args, **kwargs):
-        threads_before = set(threading.enumerate())
-        result = func(*args, **kwargs)
-        threads_after = set(threading.enumerate())
-        new_threads = threads_after - threads_before
-        self.logger.info(f"New threads created: {new_threads}")
+        profiler = ThreadProfiler()
+        result = profiler.profile(func, *args, **kwargs)
         return result
 
     def line_profile(self, func, *args, **kwargs):
