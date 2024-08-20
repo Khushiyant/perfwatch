@@ -1,5 +1,4 @@
 import io
-import sys
 import time
 from contextlib import redirect_stdout
 
@@ -13,6 +12,7 @@ from .network import NetworkProfiler
 from .cache import CacheProfiler
 from .cpu import CPUProfiler
 from .thread import ThreadProfiler
+from .io import IOProfiler
 
 
 class ProfilerService:
@@ -98,26 +98,8 @@ class ProfilerService:
         return result
 
     def io_profile(self, func, *args, **kwargs):
-        f = io.StringIO()
-        original_stdout = sys.stdout
-        sys.stdout = f
-
-        input_bytes = 0
-        original_stdin = sys.stdin
-        input_buffer = io.StringIO()
-        sys.stdin = input_buffer
-
-        func(*args, **kwargs)
-
-        sys.stdout = original_stdout
-        captured_output = f.getvalue()
-        write_bytes = len(captured_output.encode("utf-8"))
-
-        sys.stdin = original_stdin
-        input_bytes = len(input_buffer.getvalue().encode("utf-8"))
-
-        self.logger.info(f"IO Write Bytes: {write_bytes} bytes")
-        self.logger.info(f"IO Read Bytes: {input_bytes} bytes")
+        io_profiler = IOProfiler()
+        return io_profiler.profile(func, *args, **kwargs)
 
     def database_profile(self, func, *args, **kwargs):
         # Will have to implment profile using django-debug-toolbar or pg_stat_statements to profile database
