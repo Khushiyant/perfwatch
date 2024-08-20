@@ -68,9 +68,9 @@ class ProfilerService:
         return result
 
     def time_profile(self, func, *args, **kwargs):
-        start_time = time.time()
+        start_time = time.perf_counter()
         result = func(*args, **kwargs)
-        end_time = time.time()
+        end_time = time.perf_counter()
         execution_time = end_time - start_time
         self.logger.info(f"Time execution: {execution_time:.6f} seconds")
         return result
