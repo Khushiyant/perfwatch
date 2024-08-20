@@ -81,10 +81,10 @@ class ProfilerService:
         return result
 
     def thread_profile(self, func, *args, **kwargs):
-        threads_before = threading.enumerate()
+        threads_before = set(threading.enumerate())
         result = func(*args, **kwargs)
-        threads_after = threading.enumerate()
-        new_threads = [t for t in threads_after if t not in threads_before]
+        threads_after = set(threading.enumerate())
+        new_threads = threads_after - threads_before
         self.logger.info(f"New threads created: {new_threads}")
         return result
 
