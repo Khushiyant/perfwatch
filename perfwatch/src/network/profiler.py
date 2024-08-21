@@ -13,13 +13,13 @@ class NetworkProfiler:
         self.end_time = 0
         self.packet_src = packet_src
 
-    def network_profile(self, func, *args, **kwargs):
+    def profile(self, func, *args, **kwargs):
         # Start sniffing network traffic
         self.start_time = time.time()
         scapy.sniff(prn=self.packet_handler, timeout=10)
 
         # Call the function being profiled
-        func(*args, **kwargs)
+        result = func(*args, **kwargs)
 
         # Stop sniffing network traffic
         self.end_time = time.time()
@@ -27,6 +27,8 @@ class NetworkProfiler:
         # Calculate and log network metrics
         self.calculate_metrics()
         self.log_metrics()
+
+        return result
 
     def packet_handler(self, packet):
         # Handle incoming packets

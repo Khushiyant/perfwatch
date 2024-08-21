@@ -13,6 +13,7 @@ from .cache import CacheProfiler
 from .cpu import CPUProfiler
 from .thread import ThreadProfiler
 from .io import IOProfiler
+from .system import SystemProfiler
 
 
 class ProfilerService:
@@ -107,23 +108,23 @@ class ProfilerService:
 
     def network_profile(self, func, packet_src, *args, **kwargs):
         network_profiler = NetworkProfiler(packet_src=packet_src)
-        return network_profiler.network_profile(func, *args, **kwargs)
+        return network_profiler.profile(func, *args, **kwargs)
 
     def gpu_profile(self, func, *args, **kwargs):
         gpu_profiler = GPUProfiler()
-        return gpu_profiler.gpu_profile(func, *args, **kwargs)
+        return gpu_profiler.profile(func, *args, **kwargs)
 
     def cache_profile(self, func, *args, **kwargs):
         cache_profiler = CacheProfiler()
-        return cache_profiler.run_valgrind(func, *args, **kwargs)
+        return cache_profiler.profile(func, *args, **kwargs)
 
     def exception_profile(self, func, *args, **kwargs):
         # Will have to implment profile using sentry or rollbar to profile exceptions
         raise NotImplementedError
 
     def system_profile(self, func, *args, **kwargs):
-        # Will have to implment profile using top or htop to profile system
-        raise NotImplementedError
+        profiler = SystemProfiler()
+        return profiler.profile(func, *args, **kwargs)
 
     def distributed_profile(self, func, *args, **kwargs):
         # Will have to implment profile using zipkin or opentracing to profile distributed system
